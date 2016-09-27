@@ -1,0 +1,25 @@
+#!/bin/bash
+
+export SCHEME=http
+export BROKER_NAME=Dell-Persistence
+export DOMAIN=<%= p('persistent-broker.cf.domain') %>
+export ADMIN_USER=<%= p('persistent-broker.cf.username') %>
+export ADMIN_PASSWORD=<%= p('persistent-broker.cf.password') %>
+export API_ENDPOINT=api.$DOMAIN
+
+function authenticate() {
+  cf api $API_ENDPOINT <% if p('persistent-broker.cf.skip_cert_verify') %>--skip-ssl-validation<% end %>
+  cf auth $ADMIN_USER $ADMIN_PASSWORD
+}
+
+function deregister_broker() {
+  cf purge-service-instance $BROKER_NAME -f
+  cf purge-service-offering $BROKER_NAME -f
+  cf delete-service-broker $BROKER_NAME -f
+}
+
+export PATH=$PATH:/var/vcap/packages/cfcli/bin
+export CF_DIAL_TIMEOUT=30
+
+authenticate
+deregister_broker

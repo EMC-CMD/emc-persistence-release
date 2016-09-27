@@ -1,0 +1,35 @@
+---
+name: register-broker
+templates:
+  run.erb: bin/run
+packages:
+  - cfcli
+
+properties:
+  persistent-broker.broker.username:
+    description: Username for persistent-broker
+    example: broker
+  persistent-broker.broker.password:
+    description: Password for persistent-broker
+    example: broker
+  persistent-broker.broker.host:
+    description: Host for persistent-broker
+    example: 10.1.0.1
+  persistent-broker.broker.port:
+    description: Port for persistent-broker
+    example: 8080
+  persistent-broker.cf.username:
+    description: CF System Username
+    example: username
+  persistent-broker.cf.password:
+    description: CF System Password
+    example: password
+  persistent-broker.broker.service_name:
+    description: EMC Service name for the broker to identify with
+    example: EMC-Persistence
+  persistent-broker.cf.domain:
+    description: CF System Domain
+    example: system.example.com
+  persistent-broker.cf.skip_cert_verify:
+    description: Skip cert verify
+    example: false

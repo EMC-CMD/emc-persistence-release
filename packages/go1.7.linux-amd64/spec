@@ -1,0 +1,7 @@
+---
+name: go1.7.linux-amd64
+
+dependencies: []
+
+files:
+- go1.7.linux-amd64.tar.gz # https://golang.org/doc/install?download=go1.7.linux-amd64.tar.gz

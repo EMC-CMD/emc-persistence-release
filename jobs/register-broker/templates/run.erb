@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export SCHEME=http
+export BROKER_NAME=Dell-Persistence
+export BROKER_USER=<%= p('persistent-broker.broker.username') %>
+export BROKER_PASS=<%= p('persistent-broker.broker.password') %>
+export BROKER_HOST=<%= p('persistent-broker.broker.host') %>
+export BROKER_PORT=<%= p('persistent-broker.broker.port') %>
+export BROKER_SERVICE_NAME=<%= p('persistent-broker.broker.service_name') %>
+export DOMAIN=<%= p('persistent-broker.cf.domain') %>
+export ADMIN_USER=<%= p('persistent-broker.cf.username') %>
+export ADMIN_PASSWORD=<%= p('persistent-broker.cf.password') %>
+export API_ENDPOINT=api.$DOMAIN
+
+function authenticate() {
+  cf api $API_ENDPOINT <% if p('persistent-broker.cf.skip_cert_verify') %>--skip-ssl-validation<% end %>
+  cf auth $ADMIN_USER $ADMIN_PASSWORD
+}
+
+function register_broker() {
+  broker=`cf service-brokers | grep $BROKER_NAME || true`
+  if [[ -z "$broker" ]]; then
+    cf create-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST:$BROKER_PORT
+  else
+    cf update-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST:$BROKER_PORT
+  fi
+
+  cf enable-service-access $BROKER_SERVICE_NAME
+}
+export PATH=$PATH:/var/vcap/packages/cfcli/bin
+export CF_DIAL_TIMEOUT=30
+authenticate
+register_broker

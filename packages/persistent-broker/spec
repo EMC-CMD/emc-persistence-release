@@ -1,0 +1,8 @@
+---
+name: persistent-broker
+
+dependencies:
+- go1.7.linux-amd64
+
+files:
+- cf-persist-service-broker/**/*

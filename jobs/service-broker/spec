@@ -1,6 +1,0 @@
----
-name: service-broker
-templates:
-  ctl.erb: bin/ctl
-
-packages:

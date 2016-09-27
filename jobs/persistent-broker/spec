@@ -1,0 +1,36 @@
+---
+name: persistent-broker
+templates:
+  ctl.erb: bin/ctl
+
+packages:
+- persistent-broker
+
+properties:
+  persistent-broker.broker.username:
+    description: Username for persistent-broker
+    example: broker
+  persistent-broker.broker.password:
+    description: Password for persistent-broker
+    example: broker
+  persistent-broker.broker.port:
+    description: Port for the broker to listen on
+    example: 5000
+  persistent-broker.diego_driver:
+    description: Driver that diego cell uses to interact with Libstorage
+    example: rexray_isilon
+  persistent-broker.broker.service_name:
+    description: EMC Service name for the broker to identify with
+    example: EMC-Persistence
+  persistent-broker.broker.service_uuid:
+    description: service UUID for EMC-Service
+    example: Very complicated uuid
+  persistent-broker.insecure:
+    description: flag to make connections to libstorage insecure/not
+    example: false
+  persistent-broker.libstorage_service:
+    description: Libstorage service name for the broker to interface with
+    example: isilonservice
+  persistent-broker.libstorage_uri:
+    description: URI Endpoint for libstorage
+    example: 127.0.0.1

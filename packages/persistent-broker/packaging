@@ -1,0 +1,23 @@
+# abort script on any command that exits with a non zero value
+set -e
+
+if [ -z "$BOSH_PACKAGES_DIR" ]; then
+	pkg_dir=$(readlink -nf /var/vcap/packages/go1.7.linux-amd64)
+else
+	pkg_dir=$BOSH_PACKAGES_DIR/go1.7.linux-amd64
+fi
+
+export GOROOT=$pkg_dir
+export PATH=$GOROOT/bin:$PATH
+
+mkdir $BOSH_INSTALL_TARGET/bin
+
+mkdir -p src/github.com/EMC-Dojo/cf-persist-service-broker
+export GOPATH=$PWD
+mv cf-persist-service-broker/* src/github.com/EMC-Dojo/cf-persist-service-broker/
+
+cd $GOPATH/src/github.com/EMC-Dojo/cf-persist-service-broker
+
+go build
+
+cp cf-persist-service-broker $BOSH_INSTALL_TARGET/bin

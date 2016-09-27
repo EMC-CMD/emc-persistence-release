@@ -1,0 +1,20 @@
+---
+name: deregister-broker
+templates:
+  run.erb: bin/run
+packages:
+  - cfcli
+
+properties:
+  persistent-broker.cf.username:
+    description: CF System Username
+    example: username
+  persistent-broker.cf.password:
+    description: CF System Password
+    example: password
+  persistent-broker.cf.domain:
+    description: CF System Domain
+    example: system.example.com
+  persistent-broker.cf.skip_cert_verify:
+    description: Skip cert verify
+    example: false

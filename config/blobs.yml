@@ -1,1 +1,9 @@
---- {}
+---
+go1.7.linux-amd64.tar.gz:
+  object_id: eca9add7-7740-498d-9bad-7b5f81bd038b
+  sha: a744e29da97fc3aadad1ee0d7d89b0d899645e50
+  size: 81573766
+cfcli/cfcli.tgz:
+  object_id: b9f2c42d-a879-408c-b0b7-ffa08c353581
+  sha: 44b44aacd6204e9ff762da21fcbcff91e13c7a44
+  size: 6393823

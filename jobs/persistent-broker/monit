@@ -1,0 +1,5 @@
+check process emc-persistence
+  with pidfile /var/vcap/sys/run/persistent-broker/pid
+  start program "/var/vcap/jobs/persistent-broker/bin/ctl start"
+  stop program "/var/vcap/jobs/persistent-broker/bin/ctl stop"
+  group vcap
