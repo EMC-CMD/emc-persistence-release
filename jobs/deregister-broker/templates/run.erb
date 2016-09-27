@@ -13,7 +13,6 @@ function authenticate() {
 }
 
 function deregister_broker() {
-  cf purge-service-instance $BROKER_NAME -f
   cf purge-service-offering $BROKER_NAME -f
   cf delete-service-broker $BROKER_NAME -f
 }
