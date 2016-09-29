@@ -5,7 +5,6 @@ export BROKER_NAME=Dell-Persistence
 export BROKER_USER=<%= p('persistent-broker.broker.username') %>
 export BROKER_PASS=<%= p('persistent-broker.broker.password') %>
 export BROKER_HOST=<%= p('persistent-broker.broker.host') %>
-export BROKER_PORT=<%= p('persistent-broker.broker.port') %>
 export BROKER_SERVICE_NAME=<%= p('persistent-broker.broker.service_name') %>
 export DOMAIN=<%= p('persistent-broker.cf.domain') %>
 export ADMIN_USER=<%= p('persistent-broker.cf.username') %>
@@ -20,9 +19,9 @@ function authenticate() {
 function register_broker() {
   broker=`cf service-brokers | grep $BROKER_NAME || true`
   if [[ -z "$broker" ]]; then
-    cf create-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST:$BROKER_PORT
+    cf create-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST
   else
-    cf update-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST:$BROKER_PORT
+    cf update-service-broker $BROKER_NAME $BROKER_USER $BROKER_PASS $SCHEME://$BROKER_HOST
   fi
 
   cf enable-service-access $BROKER_SERVICE_NAME

@@ -15,9 +15,6 @@ properties:
   persistent-broker.broker.host:
     description: Host for persistent-broker
     example: 10.1.0.1
-  persistent-broker.broker.port:
-    description: Port for persistent-broker
-    example: 8080
   persistent-broker.cf.username:
     description: CF System Username
     example: username
