@@ -15,13 +15,11 @@ case $1 in
     export BROKER_PASSWORD=<%= p('persistent-broker.broker.password') %>
     export BROKER_USERNAME=<%= p('persistent-broker.broker.username') %>
     export DIEGO_DRIVER_SPEC=<%= p('persistent-broker.diego_driver') %>
-    export EMC_SERVICE_NAME=<%= p('persistent-broker.broker.service_name') %>
     # Generate?
-    export EMC_SERVICE_UUID=<%= p('persistent-broker.broker.service_uuid') %>
     export INSECURE=<%= p('persistent-broker.insecure') %>
-    export LIB_STOR_SERVICE=<%= p('persistent-broker.libstorage_service') %>
     export LIBSTORAGE_URI=<%= p('persistent-broker.libstorage_uri') %>
     export PORT=<%= p('persistent-broker.broker.port') %>
+    export BROKER_CONFIG_PATH=/var/vcap/jobs/persistent-broker/config/config.json
 
     # start app
     cd /var/vcap/packages/persistent-broker/bin
@@ -29,7 +27,6 @@ case $1 in
     exec ./cf-persist-service-broker \
       >>  $LOG_DIR/persistent-broker.stdout.log \
       2>> $LOG_DIR/persistent-broker.stderr.log
-
     ;;
 
   stop)

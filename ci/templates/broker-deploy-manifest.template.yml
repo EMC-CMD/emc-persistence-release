@@ -1,0 +1,104 @@
+name: persistent-broker
+director_uuid: ed63d33f-e16a-4ed7-890e-cb0edfcb002d
+
+releases:
+- {name: emc-persistence-release, version: latest}
+- {name: routing, version: latest}
+
+jobs:
+  - name: persistent-broker
+    instances: 1
+    networks:
+    - name: private
+      static_ips:
+      - {{ static_ip }}
+    templates:
+    - name: persistent-broker
+      release: emc-persistence-release
+    persistent_disk_pool: medium
+    vm_type: medium
+    stemcell: trusty
+    azs:
+    - z1
+    properties:
+      persistent-broker:
+        diego_driver: {{ diego_driver_name }}
+        insecure: true
+        libstorage_uri: {{ libstorage_uri }}
+        broker:
+          host: {{ static_ip }}
+          password: {{ broker_username }}
+          port: {{ broker_port }}
+          username: {{ broker_password }}
+          services:
+          - name: {{ broker_service_name }}
+            id: {{ broker_service_uuid }}
+            metadata:
+              displayName: "Persistent-Broker"
+              documentationUrl: "docsURL"
+              imageUrl: "imageURL"
+              longDescription: "longDescription"
+              providerDisplayName: "Dell EMC"
+              supportUrl: "supportUrl"
+            plans:
+            {% for broker_plan in broker_plans %}
+            - name: {{ broker_plan }}
+              description: "An {{ broker_plan }} service"
+              metadata:
+                bullets:
+                - Awesome product
+                - Should use it
+            {% endfor %}
+  - name: register-broker
+    instances: 1
+    lifecycle: errand
+    networks: [{name: private}]
+    vm_type: small
+    stemcell: trusty
+    templates:
+    - name: register-broker
+      release: emc-persistence-release
+    azs: [z1]
+    properties:
+      persistent-broker:
+        cf:
+          username: {{ cf_username }}
+          password: {{ cf_password }}
+          domain: {{ cf_domain }}
+          skip_cert_verify: true
+        broker:
+          host: {{ static_ip }}
+          username: {{ broker_username}}
+          password: {{ broker_password }}
+          service_name: {{ broker_service_name }}
+
+
+  - name: deregister-broker
+    instances: 1
+    lifecycle: errand
+    networks: [{name: private}]
+    vm_type: small
+    stemcell: trusty
+    templates:
+    - name: deregister-broker
+      release: emc-persistence-release
+    azs: [z1]
+    properties:
+      persistent-broker:
+        cf:
+          username: {{ cf_username }}
+          password: {{ cf_password }}
+          domain: {{ cf_domain }}
+          skip_cert_verify: true
+
+stemcells:
+- alias: trusty
+  os: ubuntu-trusty
+  version: '3262.9'
+
+update:
+  canaries: 1
+  max_in_flight: 3
+  serial: false
+  canary_watch_time: 1000-240000
+  update_watch_time: 1000-240000

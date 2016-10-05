@@ -28,3 +28,4 @@ src/github.com/vito/gosub/
 src/github.com/codegangsta/cli/
 *.iml
 releases/
+ci/templates/broker-deploy-manifest.yml
