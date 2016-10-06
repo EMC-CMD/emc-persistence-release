@@ -11,7 +11,9 @@ class Test(unittest.TestCase):
         bosh_username=os.environ['BOSH_USERNAME']
         os.chdir('emc-persistence-release')
         self.bosh_target(bosh_uri, bosh_username, bosh_password)
+        self.generate_blobstore_creds()
         self.create_and_upload_release("emc-persistence-release")
+
 
     def tearDown(self):
         self.delete_deployment("persistent-broker")
@@ -29,14 +31,13 @@ class Test(unittest.TestCase):
     def delete_release(self, release_name):
         self.assert_call(["bosh", "-n", "delete", "release", release_name])
 
-    def generate_broker_manifest(self):
-        broker_manifest_file_name = 'broker-deploy-manifest.yml'
-        broker_manifest_template_file = 'broker-deploy-manifest.template.yml'
+    def get_template_file(self, file_name):
         template_folder='ci/templates'
-        broker_manifest_file_path = os.path.join(template_folder, broker_manifest_file_name)
-
         env = Environment(loader=FileSystemLoader(template_folder))
-        template = env.get_template(broker_manifest_template_file)
+        return env.get_template(file_name)
+
+    def generate_broker_manifest(self):
+        template = self.get_template_file('broker-deploy-manifest.template.yml')
         broker_plans=os.environ['BROKER_PLANS'].split(',')
         rendered = template.render(
             broker_password=os.environ['BROKER_PASSWORD'],
@@ -52,11 +53,26 @@ class Test(unittest.TestCase):
             libstorage_uri=os.environ['LIBSTORAGE_URI'],
             static_ip=os.environ['STATIC_IP']
         )
+
         print(rendered)
+        broker_manifest_file_name = 'broker-deploy-manifest.yml'
+        broker_manifest_file_path = os.path.join("ci/templates", broker_manifest_file_name)
         with open(broker_manifest_file_path, 'w') as f:
             f.write(rendered)
 
         return broker_manifest_file_path
+
+
+    def generate_blobstore_creds(self):
+        print("GENERATING BLOBSTORE CREDENTIALS")
+        template = self.get_template_file('private.template.yml')
+        rendered = template.render(
+            aws_access_key=os.environ['AWS_ACCESS_KEY'],
+            aws_secret_key=os.environ['AWS_SECRET_KEY']
+        )
+        dest_path = "config/private.yml"
+        with open(dest_path, 'w') as f:
+            f.write(rendered)
 
     def bosh_target(self, uri, username, password):
         self.assert_call(["bosh", "-n", "target", uri])
