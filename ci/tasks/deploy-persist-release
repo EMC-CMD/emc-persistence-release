@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import yaml
 from jinja2 import Environment, FileSystemLoader
 import os
 from subprocess import call
@@ -28,6 +27,7 @@ def generate_broker_manifest():
         libstorage_uri=os.environ['LIBSTORAGE_URI'],
         static_ip=os.environ['STATIC_IP']
     )
+    print(rendered)
     with open(broker_manifest_file_path, 'w') as f:
         f.write(rendered)
 
@@ -35,7 +35,9 @@ def generate_broker_manifest():
 
 def bosh_deploy(manifest_path):
     call(["bosh", "deployment", manifest_path])
-    call(["bosh", "-n" "deploy"])
+    call(["bosh", "-n", "deploy"])
+    call(["bosh", "-n", "run", "errand", "register-broker"])
+    call(["bosh", "-n", "run", "errand", "deregister-broker"])
 
 def main():
     manifest_path = generate_broker_manifest()

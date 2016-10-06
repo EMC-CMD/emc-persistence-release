@@ -17,7 +17,7 @@ jobs:
         type: docker-image
         source:
           repository: {{docker_repo}}
-          tag: {{docker_tag}}
+          insecure_registries: [{{docker_registry}}]
     config:
       <<: *docker
       inputs:
@@ -36,7 +36,7 @@ jobs:
         LIBSTORAGE_URI: {{libstorage_uri}}
         STATIC_IP: {{static_ip}}
       run:
-        path: cf-persist-boshrelease/ci/tasks/integration
+        path: cf-persist-boshrelease/ci/tasks/deploy-persist-release
 
 resources:
 - name: cf-persist-boshrelease

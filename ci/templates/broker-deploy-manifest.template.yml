@@ -33,6 +33,8 @@ jobs:
           services:
           - name: {{ broker_service_name }}
             id: {{ broker_service_uuid }}
+            description: "Support Isilon and Scaleio Arrays in Cloud Foundry"
+            requires: ["volume_mount"]
             metadata:
               displayName: "Persistent-Broker"
               documentationUrl: "docsURL"
