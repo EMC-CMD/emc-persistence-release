@@ -1,6 +1,6 @@
 
 groups:
-- name: Virtustream-CloudFoundry
+- name: Persistent-Release
   jobs:
   - integration
 

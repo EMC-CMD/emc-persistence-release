@@ -6,8 +6,7 @@ from subprocess import call
 def generate_broker_manifest():
     broker_manifest_file_name = 'broker-deploy-manifest.yml'
     broker_manifest_template_file = 'broker-deploy-manifest.template.yml'
-    container_path = os.getcwd()
-    template_folder= os.path.join(container_path, 'ci/templates')
+    template_folder='ci/templates'
     broker_manifest_file_path = os.path.join(template_folder, broker_manifest_file_name)
 
     env = Environment(loader=FileSystemLoader(template_folder))
@@ -40,6 +39,7 @@ def bosh_deploy(manifest_path):
     call(["bosh", "-n", "run", "errand", "deregister-broker"])
 
 def main():
+    os.chdir('emc-persistence-release')
     manifest_path = generate_broker_manifest()
     bosh_deploy(manifest_path)
 
