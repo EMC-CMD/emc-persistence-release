@@ -32,6 +32,10 @@ def generate_broker_manifest():
 
     return broker_manifest_file_path
 
+def bosh_target(uri, username, password):
+    call(["bosh", "target", uri])
+    call(["bosh", "login", username, password])
+
 def bosh_deploy(manifest_path):
     call(["bosh", "deployment", manifest_path])
     call(["bosh", "-n", "deploy"])
@@ -39,8 +43,13 @@ def bosh_deploy(manifest_path):
     call(["bosh", "-n", "run", "errand", "deregister-broker"])
 
 def main():
+    bosh_uri=os.environ['BOSH_URI']
+    bosh_password=os.environ['BOSH_PASSWORD']
+    bosh_username=os.environ['BOSH_USERNAME']
+
     os.chdir('emc-persistence-release')
     manifest_path = generate_broker_manifest()
+    bosh_target(bosh_uri, bosh_username, bosh_password)
     bosh_deploy(manifest_path)
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - {trigger: true,         get: cf-persist-boshrelease}
+    - {trigger: true,         get: emc-persistence-release}
   - task: integration
     docker-image: &docker
       platform: linux
@@ -21,8 +21,11 @@ jobs:
     config:
       <<: *docker
       inputs:
-      - name: cf-persist-boshrelease
+      - name: emc-persistence-release
       params:
+        BOSH_URI: {{bosh_uri}}
+        BOSH_USERNAME: {{bosh_username}}
+        BOSH_PASSWORD: {{bosh_password}}
         BROKER_PASSWORD: {{broker_password}}
         BROKER_PLANS: {{broker_plans}}
         BROKER_PORT: {{broker_port}}
@@ -36,10 +39,10 @@ jobs:
         LIBSTORAGE_URI: {{libstorage_uri}}
         STATIC_IP: {{static_ip}}
       run:
-        path: cf-persist-boshrelease/ci/tasks/deploy-persist-release
+        path: emc-persistence-release/ci/tasks/deploy-persist-release
 
 resources:
-- name: cf-persist-boshrelease
+- name: emc-persistence-release
   type: git
   source:
     uri: https://github.com/EMC-CMD/emc-persistence-release
