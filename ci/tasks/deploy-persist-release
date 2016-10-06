@@ -2,59 +2,78 @@
 from jinja2 import Environment, FileSystemLoader
 import os
 from subprocess import call
+import unittest
 
-def generate_broker_manifest():
-    broker_manifest_file_name = 'broker-deploy-manifest.yml'
-    broker_manifest_template_file = 'broker-deploy-manifest.template.yml'
-    template_folder='ci/templates'
-    broker_manifest_file_path = os.path.join(template_folder, broker_manifest_file_name)
+class Test(unittest.TestCase):
+    def setUp(self):
+        bosh_uri=os.environ['BOSH_URI']
+        bosh_password=os.environ['BOSH_PASSWORD']
+        bosh_username=os.environ['BOSH_USERNAME']
+        os.chdir('emc-persistence-release')
+        self.bosh_target(bosh_uri, bosh_username, bosh_password)
+        self.create_and_upload_release("emc-persistence-release")
 
-    env = Environment(loader=FileSystemLoader(template_folder))
-    template = env.get_template(broker_manifest_template_file)
-    broker_plans=os.environ['BROKER_PLANS'].split(',')
-    rendered = template.render(
-        broker_password=os.environ['BROKER_PASSWORD'],
-        broker_plans=broker_plans,
-        broker_port=os.environ['BROKER_PORT'],
-        broker_service_name=os.environ['BROKER_SERVICE_NAME'],
-        broker_service_uuid=os.environ['BROKER_SERVICE_UUID'],
-        broker_username=os.environ['BROKER_USERNAME'],
-        cf_domain=os.environ['CF_DOMAIN'],
-        cf_password=os.environ['CF_PASSWORD'],
-        cf_username=os.environ['CF_USERNAME'],
-        diego_driver_name=os.environ['DIEGO_DRIVER_NAME'],
-        libstorage_uri=os.environ['LIBSTORAGE_URI'],
-        static_ip=os.environ['STATIC_IP']
-    )
-    print(rendered)
-    with open(broker_manifest_file_path, 'w') as f:
-        f.write(rendered)
+    def tearDown(self):
+        self.delete_deployment("persistent-broker")
+        self.delete_release("emc-persistence-release")
+    #-----------------TESTS --------------------------
+    def test_bosh_release_lifecycle(self):
+        manifest_path = self.generate_broker_manifest()
+        self.deploy_and_register_broker(manifest_path)
 
-    return broker_manifest_file_path
+    #-------------------HELPERS-----------------
+    def create_and_upload_release(self, release_name):
+        self.assert_call(["bosh", "create", "release", "--force", "--name", release_name])
+        self.assert_call(["bosh", "upload", "release"])
 
-def bosh_target(uri, username, password):
-    call(["bosh", "-n", "target", uri])
-    call(["bosh", "login", username, password])
+    def delete_release(self, release_name):
+        self.assert_call(["bosh", "-n", "delete", "release", release_name])
 
-def bosh_deploy(manifest_path):
-    call(["bosh", "deployment", manifest_path])
-    call(["bosh", "-n", "deploy"])
-    call(["bosh", "-n", "run", "errand", "register-broker"])
-    call(["bosh", "-n", "run", "errand", "deregister-broker"])
+    def generate_broker_manifest(self):
+        broker_manifest_file_name = 'broker-deploy-manifest.yml'
+        broker_manifest_template_file = 'broker-deploy-manifest.template.yml'
+        template_folder='ci/templates'
+        broker_manifest_file_path = os.path.join(template_folder, broker_manifest_file_name)
 
-def bosh_delete_deployment(deployment_name):
-    call(["bosh", "-n", "delete", "deployment", deployment_name])
+        env = Environment(loader=FileSystemLoader(template_folder))
+        template = env.get_template(broker_manifest_template_file)
+        broker_plans=os.environ['BROKER_PLANS'].split(',')
+        rendered = template.render(
+            broker_password=os.environ['BROKER_PASSWORD'],
+            broker_plans=broker_plans,
+            broker_port=os.environ['BROKER_PORT'],
+            broker_service_name=os.environ['BROKER_SERVICE_NAME'],
+            broker_service_uuid=os.environ['BROKER_SERVICE_UUID'],
+            broker_username=os.environ['BROKER_USERNAME'],
+            cf_domain=os.environ['CF_DOMAIN'],
+            cf_password=os.environ['CF_PASSWORD'],
+            cf_username=os.environ['CF_USERNAME'],
+            diego_driver_name=os.environ['DIEGO_DRIVER_NAME'],
+            libstorage_uri=os.environ['LIBSTORAGE_URI'],
+            static_ip=os.environ['STATIC_IP']
+        )
+        print(rendered)
+        with open(broker_manifest_file_path, 'w') as f:
+            f.write(rendered)
 
-def main():
-    bosh_uri=os.environ['BOSH_URI']
-    bosh_password=os.environ['BOSH_PASSWORD']
-    bosh_username=os.environ['BOSH_USERNAME']
+        return broker_manifest_file_path
 
-    os.chdir('emc-persistence-release')
-    manifest_path = generate_broker_manifest()
-    bosh_target(bosh_uri, bosh_username, bosh_password)
-    bosh_deploy(manifest_path)
-    bosh_delete_deployment("persistent-broker")
+    def bosh_target(self, uri, username, password):
+        self.assert_call(["bosh", "-n", "target", uri])
+        self.assert_call(["bosh", "login", username, password])
+
+    def deploy_and_register_broker(self, manifest_path):
+        self.assert_call(["bosh", "deployment", manifest_path])
+        self.assert_call(["bosh", "-n", "deploy"])
+        self.assert_call(["bosh", "-n", "run", "errand", "register-broker"])
+        self.assert_call(["bosh", "-n", "run", "errand", "deregister-broker"])
+
+    def delete_deployment(self, deployment_name):
+        self.assert_call(["bosh", "-n", "delete", "deployment", deployment_name])
+
+    def assert_call(self, command):
+        status = call(command)
+        self.assertEqual(status, 0)
 
 if __name__ == '__main__':
-    main()
+    unittest.main()
