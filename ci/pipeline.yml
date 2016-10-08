@@ -51,7 +51,6 @@ jobs:
   - aggregate:
     - {trigger: true,         get: emc-persistence-release,  passed: [integration]}
     - {trigger: false,        get: persistence-release-version, params: {bump: major}}
-    - {put: final-release,    params: {file: promote/emc-persistence-release-*.tgz}}
   - task: ship-release
     docker-image: &docker
       platform: linux
@@ -64,6 +63,7 @@ jobs:
       <<: *docker
       inputs:
       - name: emc-persistence-release
+      - name: persistence-release-version
       outputs:
       - name: promote
       params:
@@ -71,8 +71,13 @@ jobs:
         AWS_SECRET_KEY: {{aws_secret_key}}
         GITHUB_USER:              {{github_user}}
         GITHUB_EMAIL:             {{github_email}}
+        VERSION_FILE:             persistence-release-version/number
       run:
         path: emc-persistence-release/ci/tasks/ship-release
+  - put: final-release
+    params: {file: promote/emc-persistence-release-*.tgz}
+  - put: emc-persistence-release
+    params: {repository: promote/emc-persistence-release, rebase: true, tag_prefix: "v", tag: promote/integer_version}
 
 resources:
 - name: emc-persistence-release
