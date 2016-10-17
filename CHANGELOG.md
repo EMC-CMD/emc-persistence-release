@@ -2,3 +2,5 @@
 1a0b64d Add ship release in pipeline
 ## v3
 eeae1fe Modify pipeline to include release auto commit
+## v4
+23707c0 :airplane: New final release v3
