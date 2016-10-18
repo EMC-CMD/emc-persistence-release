@@ -12,6 +12,7 @@ class Test(unittest.TestCase):
         os.chdir('emc-persistence-release')
         self.bosh_target(bosh_uri, bosh_username, bosh_password)
         self.generate_blobstore_creds()
+        self.update_broker_submodule()
         self.create_and_upload_release("emc-persistence-release")
 
 
@@ -90,6 +91,9 @@ class Test(unittest.TestCase):
     def assert_call(self, command):
         status = call(command)
         self.assertEqual(status, 0)
+    
+    def update_broker_submodule(self):
+        self.assert_call(["git", "submodule", "update", "--remote", "src/cf-persist-service-broker"])
 
 if __name__ == '__main__':
     unittest.main()

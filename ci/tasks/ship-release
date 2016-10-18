@@ -20,13 +20,15 @@ EOF
   git config --global user.email ${GITHUB_EMAIL}
   git config --global user.name ${GITHUB_USER}
   git config --global push.default simple
+  git submodule update --remote src/cf-persist-service-broker
 
   echo "## v${integer_version}" >> CHANGELOG.md
   echo `git log -1 --abbrev-commit --pretty=oneline` >> CHANGELOG.md
   echo "${integer_version}.0.0" > ci/version
   git add CHANGELOG.md
   git add ci/version
-
+  git add src/cf-persist-service-broker 
+  
   git commit -m ":airplane: New final release v${integer_version}" -m "[ci skip]"
 
   bosh -n create release --with-tarball --final --version ${integer_version}
